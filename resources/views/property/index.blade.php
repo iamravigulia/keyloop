@@ -3,6 +3,11 @@
 @section('content')
     <div class="container mx-auto mt-6 px-4">
         <h1 class="text-2xl font-semibold">Property List</h1>
+        @if(session('alert'))
+            <div id="alertmsg" class="w-full bg-red-300 my-2 py-2 px-2 rounded">{{session('alert')}}</div>
+        @endif
+        
+
         <form action="{{ route('properties.index') }}" method="GET" class="mt-4">
             <div class="flex flex-wrap">
                 <div class="w-1/6">
@@ -101,16 +106,26 @@
                     <td class="px-4 py-2 border">{{ $property->price }}</td>
                     <td class="px-4 py-2 border">{{ $property->propertyType?->title }}</td>
                     <td class="px-4 py-2 border">{{ $property->type }}</td>
-                    <td class="px-4 py-2 border">
-                        <a href="{{route('properties.edit', $property->id)}}" class="btn px-2 py-1 bg-blue-600 hover:bg-blue-800 text-white rounded">Edit</a>
+                    <td class="px-4 py-2 border flex">
+                        <a href="{{route('properties.edit', $property->id)}}" class="my-2 btn px-2 py-1 bg-blue-600 hover:bg-blue-800 text-white rounded">Edit</a>
+                        <form action="{{ route('properties.destroy', $property->id) }}" method="POST">
+                            @csrf
+                            @method('delete')
+                            <button type="submit" class="my-2 btn ml-1 px-2 py-1 bg-red-600 hover:bg-red-800 text-white rounded">Delete</button>
+                        </form>
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
-
         <div class="mt-4">
             {{ $properties->links() }}
         </div>
     </div>
+    <script>
+        const alertmsg = document.getElementById('alertmsg')
+        setTimeout(() => {
+            alertmsg.setAttribute('hidden', true)
+        }, 3000);
+    </script>
 @endsection

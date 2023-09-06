@@ -48,4 +48,10 @@ class PropertyController extends Controller
         $property = Property::findOrFail($id);
         return view('property.edit', compact('property', 'propertyTypes'));
     }
+
+    public function destroy($id){
+        $property = Property::findOrFail($id);
+        $property->delete();
+        return redirect('/properties/index')->with('alert', 'Property deleted successfully');
+    }
 }
