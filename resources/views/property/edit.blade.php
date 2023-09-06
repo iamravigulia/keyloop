@@ -85,14 +85,24 @@
                         </div>
                         <div class="mb-4">
                             <label for="num_bedrooms" class="block text-gray-700 font-bold capitalize">num_bedrooms:</label>
-                            <input type="number" class="border border-gray-600 py-1 px-1 w-full rounded" name="num_bedrooms" id="num_bedrooms" placeholder="3" value="{{ old('num_bedrooms', $property?->num_bedrooms) }}">
+                            {{-- <input type="number" class="border border-gray-600 py-1 px-1 w-full rounded" name="num_bedrooms" id="num_bedrooms" placeholder="3" value="{{ old('num_bedrooms', $property?->num_bedrooms) }}"> --}}
+                            <select name="num_bedrooms" id="" class="border border-gray-600 py-1 px-1 w-full rounded">
+                                @for ($i = 1; $i <= 15; $i++)
+                                <option {{ $property?->num_bedrooms == $i ? 'selected' : '' }} value="{{$i}}">{{$i}}</option>
+                                @endfor
+                            </select>
                             @error('num_bedrooms')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                             @enderror 
                         </div>
                         <div class="mb-4">
                             <label for="num_bathrooms" class="block text-gray-700 font-bold capitalize">num_bathrooms:</label>
-                            <input type="number" class="border border-gray-600 py-1 px-1 w-full rounded" name="num_bathrooms" id="num_bathrooms" placeholder="2" value="{{ old('num_bathrooms', $property?->num_bathrooms) }}">
+                            {{-- <input type="number" class="border border-gray-600 py-1 px-1 w-full rounded" name="num_bathrooms" id="num_bathrooms" placeholder="2" value="{{ old('num_bathrooms', $property?->num_bathrooms) }}"> --}}
+                            <select name="num_bathrooms" id="" class="border border-gray-600 py-1 px-1 w-full rounded">
+                                @for ($i = 1; $i < 15; $i++)
+                                <option {{ $property?->num_bathrooms == $i ? 'selected' : '' }} value="{{$i}}">{{$i}}</option>
+                                @endfor
+                            </select>
                             @error('num_bathrooms')
                             <span class="text-red-500 text-sm">{{ $message }}</span>
                             @enderror 
