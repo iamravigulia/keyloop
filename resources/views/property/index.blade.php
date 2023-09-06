@@ -3,72 +3,83 @@
 @section('content')
     <div class="container mx-auto mt-6 px-4">
         <h1 class="text-2xl font-semibold">Property List</h1>
+        <a href="{{route('properties.edit')}}" class="px-2 py-1 bg-blue-400 text-white rounded inline-block my-2">Create Property</a>
         @if(session('alert'))
             <div id="alertmsg" class="w-full bg-red-300 my-2 py-2 px-2 rounded">{{session('alert')}}</div>
         @endif
-        
-
-        <form action="{{ route('properties.index') }}" method="GET" class="mt-4">
-            <div class="flex flex-wrap">
-                <div class="w-1/6">
-                    <div class="px-2">
-                        <label class="text-sm mb-1 block" for="name">Name</label>
-                        <input type="text" name="name" value="{{$searchQuery['name']}}" class="w-full border border-gray-400 px-4 py-1" placeholder="Search by Country Name, Town,">
+        @if(session('success'))
+            <div id="alertmsg" class="w-full bg-green-300 my-2 py-2 px-2 rounded">{{session('success')}}</div>
+        @endif
+    </div>
+    
+        <div class="bg-gray-200 my-4 pb-4 px-4 py-2">
+            <form action="{{ route('properties.index') }}" method="GET" class="">
+                <div class="flex flex-wrap">
+                    <div class="w-2/12">
+                        <div class="px-2">
+                            <label class="text-sm mb-1 block" for="name">Name</label>
+                            <input type="text" name="name" value="{{$searchQuery['name']}}" class="w-full border border-gray-400 px-4 py-1" placeholder="Search by Country Name, Town,">
+                        </div>
                     </div>
-                </div>
-                <div class="w-1/6">
-                    <div class="px-2">
-                        <label class="text-sm mb-1 block" for="bedrooms">Number of Bedrooms</label>
-                        <input type="number" name="bedrooms" value="{{$searchQuery['bedrooms']}}" class="w-full border border-gray-400 px-4 py-1" placeholder="5">
+                    <div class="w-1/12">
+                        <div class="px-2">
+                            <label class="text-sm mb-1 block" for="bedrooms">No. of Bedrooms</label>
+                            <input type="number" name="bedrooms" value="{{$searchQuery['bedrooms']}}" class="w-full border border-gray-400 px-4 py-1" placeholder="5">
+                        </div>
                     </div>
-                </div>
-                <div class="w-1/6">
-                    <div class="px-2">
-                        <label class="text-sm mb-1 block" for="price">Price</label>
-                        <input type="number" name="price" value="{{$searchQuery['price']}}" class="w-full border border-gray-400 px-4 py-1" placeholder="5000">
+                    <div class="w-1/12">
+                        <div class="px-2">
+                            <label class="text-sm mb-1 block" for="price">Price</label>
+                            <input type="number" name="price" value="{{$searchQuery['price']}}" class="w-full border border-gray-400 px-4 py-1" placeholder="5000">
+                        </div>
                     </div>
-                </div>
-                <div class="w-1/6">
-                    <div class="px-2">
-                        <label class="text-sm mb-1 inline-flex items-center mx-2">Type</label>
+                    <div class="w-2/12">
+                        <div class="px-2">
+                            <label class="text-sm mb-1 inline-flex items-center mx-2">Type</label>
+                            <div class="flex">
+                                <label class="text-sm mb-1 inline-flex items-center mx-2">
+                                    <input type="radio" class="form-radio text-blue-500" name="type" value="" checked>
+                                    <span class="ml-2">Any</span>
+                                </label>
+                                <label class="text-sm mb-1 inline-flex items-center mx-2">
+                                    <input type="radio" class="form-radio text-blue-500" name="type" value="rent" {{ $searchQuery['type'] == 'rent' ? 'checked' : '' }}>
+                                    <span class="ml-2">Rent</span>
+                                </label>            
+                                <label class="text-sm mb-1 inline-flex items-center mx-2">
+                                    <input type="radio" class="form-radio text-blue-500" name="type" value="sale" {{ $searchQuery['type'] == 'sale' ? 'checked' : '' }}>
+                                    <span class="ml-2">Sale</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-2/12">
+                        <div class="px-2">
+                            <label class="text-sm mb-1 block" for="typeid">Property Type</label>
+                            <select name="typeid" id="" class="w-full border border-gray-400 px-4 py-1">
+                                <option value="0" selected>All Property Type</option>
+                                @forelse ($propertyTypes as $pType)
+                                    @if($searchQuery['typeid'] == $pType->id)
+                                        <option value="{{$pType->id}}" selected>{{$pType->title}}</option>
+                                    @else
+                                        <option value="{{$pType->id}}">{{$pType->title}}</option>
+                                    @endif
+                                @empty
+                                    <option value="0" selected>All Property Type</option>
+                                @endforelse
+                            </select>
+                        </div>
+                    </div>
+                    <div class="w-2/12">
                         <div class="flex">
-                            <label class="text-sm mb-1 inline-flex items-center mx-2">
-                                <input type="radio" class="form-radio text-blue-500" name="type" value="" checked>
-                                <span class="ml-2">Any</span>
-                            </label>
-                            <label class="text-sm mb-1 inline-flex items-center mx-2">
-                                <input type="radio" class="form-radio text-blue-500" name="type" value="rent" {{ $searchQuery['type'] == 'rent' ? 'checked' : '' }}>
-                                <span class="ml-2">Rent</span>
-                            </label>            
-                            <label class="text-sm mb-1 inline-flex items-center mx-2">
-                                <input type="radio" class="form-radio text-blue-500" name="type" value="sale" {{ $searchQuery['type'] == 'sale' ? 'checked' : '' }}>
-                                <span class="ml-2">Sale</span>
-                            </label>
+                            <button type="submit" class="w-full mx-2 mt-4 px-4 py-2 bg-blue-500 text-white">Search</button>
+                            <a href="{{ route('properties.index') }}" class="w-full mx-2 mt-4 px-4 py-2 bg-blue-500 text-white">Reset</a>
+                            
                         </div>
                     </div>
                 </div>
-                <div class="w-1/6">
-                    <div class="px-2">
-                        <label class="text-sm mb-1 block" for="typeid">Property Type</label>
-                        <select name="typeid" id="" class="w-full border border-gray-400 px-4 py-1">
-                            <option value="0" selected>All Property Type</option>
-                            @forelse ($propertyTypes as $pType)
-                                @if($searchQuery['typeid'] == $pType->id)
-                                    <option value="{{$pType->id}}" selected>{{$pType->title}}</option>
-                                @else
-                                    <option value="{{$pType->id}}">{{$pType->title}}</option>
-                                @endif
-                            @empty
-                                <option value="0" selected>All Property Type</option>
-                            @endforelse
-                        </select>
-                    </div>
-                </div>
-                <div class="w-1/6">
-                    <button type="submit" class="w-full mt-4 px-4 py-2 bg-blue-500 text-white">Search</button>
-                </div>
-            </div>
-        </form>
+            </form>
+        </div>
+    <div class="container mx-auto mt-6 px-4">
         <table class="min-w-full overflow-scroll table-auto mt-8 text-sm">
             <thead class="text-left">
                 <tr>

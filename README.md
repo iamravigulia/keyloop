@@ -21,3 +21,5 @@ you can check index page on ```properties/index```
 extras:
 
 i have used tailwindcss for frontend, i have not did my best on frontend.
+
+i have added ```intervention/image``` for image resize 

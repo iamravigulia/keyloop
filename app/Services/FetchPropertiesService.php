@@ -34,7 +34,7 @@ class FetchPropertiesService{
             $this->currentPage = $data['current_page'];
             $this->lastPage = $data['last_page'];
             foreach($data['data'] as $propertyData){
-                $ppTypeFound = PropertyType::where('title', $propertyData['property_type']['title'])->first();
+                $ppTypeFound = PropertyType::select('id')->where('title', $propertyData['property_type']['title'])->first();
                 if(!$ppTypeFound){
                     $new_pp_Type = PropertyType::create([
                         'title'         => $propertyData['property_type']['title'],

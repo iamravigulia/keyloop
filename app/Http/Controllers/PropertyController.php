@@ -8,6 +8,7 @@ use App\Models\Property;
 use App\Models\PropertyType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Intervention\Image\Facades\Image as Image;
 
 class PropertyController extends Controller
 {
@@ -21,7 +22,7 @@ class PropertyController extends Controller
         ];
         $propertyTypes = PropertyType::select('id', 'title')->get();
         // dd($searchQuery ?? $request->all());
-        $propertiesQuery = Property::with('propertyType');
+        $propertiesQuery = Property::with('propertyType:title,id');
         if($searchQuery['name']){
             $propertiesQuery = $propertiesQuery->where('county', 'LIKE', '%'.$searchQuery['name'].'%')
             ->orWhere('country', 'LIKE', '%'.$searchQuery['name'].'%')
@@ -43,9 +44,12 @@ class PropertyController extends Controller
         return view('property.index', compact('properties', 'searchQuery', 'propertyTypes'));
     }
 
-    public function edit($id){
+    public function edit($id = null){
         $propertyTypes = PropertyType::select('id', 'title')->get();
-        $property = Property::findOrFail($id);
+        $property = Property::with('propertyType:title,id')->where('id', $id)->first();
+        if($property){
+            return view('property.edit', compact('property', 'propertyTypes'));
+        }
         return view('property.edit', compact('property', 'propertyTypes'));
     }
 
@@ -53,5 +57,68 @@ class PropertyController extends Controller
         $property = Property::findOrFail($id);
         $property->delete();
         return redirect('/properties/index')->with('alert', 'Property deleted successfully');
+    }
+
+    public function update(Request $request, $id = null){
+        $property = Property::where('id', $id)->first();
+        $validateBox = array();
+        if(!$property){
+            $property = new Property();
+            $validateBox['image'] = 'required|image|mimes:jpeg,png,jpg,gif|max:2048';
+        }else{
+            $validateBox['image'] = 'image|mimes:jpeg,png,jpg,gif|max:2048';
+        }
+        
+        $validateBox['county']                = 'required';
+        $validateBox['country']               = 'required';
+        $validateBox['town']                  = 'required';
+        $validateBox['description']           = 'required';
+        $validateBox['displayableAddress']    = 'required';
+        $validateBox['latitude']              = 'required';
+        $validateBox['longitude']             = 'required';
+        $validateBox['num_bedrooms']          = 'required';
+        $validateBox['num_bathrooms']         = 'required';
+        $validateBox['price']                 = 'required';
+        $validateBox['property_type_id']      = 'required';
+        $validateBox['type']                  = 'required';
+
+        $request->validate($validateBox);
+
+        $uploadedImage = $request->file('image');
+        if($uploadedImage){
+            $path = public_path('storage');
+            $filename = uniqid() . "." . $uploadedImage->extension();
+            $thumb_filename = uniqid() . "." . $uploadedImage->extension();
+    
+            Image::make($uploadedImage)->save($path . '/' . $filename);
+            Image::make($uploadedImage)->resize(100, 100)->save($path . '/' . $thumb_filename);
+            $fullImage = URL('/storage') . '/' . $filename;
+            $thumbnail = URL('/storage') . '/' . $thumb_filename;
+
+            $property->image            = $fullImage ?? $property->image;
+            $property->thumnail         = $thumbnail ?? $property->thumnail;
+
+        }
+
+        // dd($fullImage, $thumbnail);
+
+        $property->county           = $request->county;
+        $property->country          = $request->country;
+        $property->town             = $request->town;
+        $property->description      = $request->description;
+        $property->displayableAddress = $request->displayableAddress;
+        $property->latitude         = $request->latitude;
+        $property->longitude        = $request->longitude;
+        $property->num_bedrooms     = $request->num_bedrooms;
+        $property->num_bathrooms    = $request->num_bathrooms;
+        $property->price            = $request->price;
+        $property->property_type_id = $request->property_type_id;
+        $property->type             = $request->type;
+        $property->save();
+
+        if($id){
+            return redirect('/properties/index')->with('success', 'Property updated successfully');
+        }
+        return redirect('/properties/index')->with('success', 'Property added successfully');
     }
 }
